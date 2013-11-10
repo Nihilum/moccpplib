@@ -57,4 +57,4 @@ protected:
     void test_ctime();
 };
 
-#endif MOCCPP_TESTS_SYSTEM_TEST_SYSTEM_HPP
+#endif // MOCCPP_TESTS_SYSTEM_TEST_SYSTEM_HPP

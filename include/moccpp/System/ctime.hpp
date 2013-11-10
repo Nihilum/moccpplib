@@ -41,9 +41,9 @@ namespace moccpp
 namespace System
 {
 
-MOCCPP_DLL_PUBLIC inline int32_t gmtime(const time_t* timer, struct tm* result);
-MOCCPP_DLL_PUBLIC inline int32_t asctime(char* buffer, size_t buff_size, const struct tm *_tm);
-MOCCPP_DLL_PUBLIC inline int32_t ctime(char* buffer, size_t buff_size, const time_t* timer);
+MOCCPP_DLL_PUBLIC int32_t gmtime(const time_t* timer, struct tm* result);
+MOCCPP_DLL_PUBLIC int32_t asctime(char* buffer, size_t buff_size, const struct tm *_tm);
+MOCCPP_DLL_PUBLIC int32_t ctime(char* buffer, size_t buff_size, const time_t* timer);
 
 }
 

@@ -32,17 +32,17 @@
 namespace moccpp
 {
 
-MOCCPP_CONSTEXPR uint16_t get_library_version_major()
+uint16_t get_library_version_major()
 {
 	return MOCCPP_LIBRARY_VERSION_MAJOR;
 }
 
-MOCCPP_CONSTEXPR uint16_t get_library_version_minor()
+uint16_t get_library_version_minor()
 {
 	return MOCCPP_LIBRARY_VERSION_MINOR;
 }
 
-MOCCPP_CONSTEXPR uint16_t get_library_version_patch()
+uint16_t get_library_version_patch()
 {
 	return MOCCPP_LIBRARY_VERSION_PATCH;
 }
@@ -51,16 +51,17 @@ MOCCPP_CONSTEXPR uint16_t get_library_version_patch()
  * "48" is a position of '0' digit in the ASCII table (see http://www.asciitable.com/).
  * Adding 48 to any number out there will provide char representation of an int value.
  */
-MOCCPP_CONSTEXPR const char* get_library_version_string()
+static char version[6] = {
+	static_cast<char>(MOCCPP_LIBRARY_VERSION_MAJOR + 48),
+	'.',
+	static_cast<char>(MOCCPP_LIBRARY_VERSION_MINOR + 48),
+	'.',
+	static_cast<char>(MOCCPP_LIBRARY_VERSION_PATCH + 48),
+	'\0'
+};
+
+const char* get_library_version_string()
 {
-	static char version[6] = {
-		static_cast<char>(MOCCPP_LIBRARY_VERSION_MAJOR + 48),
-		'.',
-		static_cast<char>(MOCCPP_LIBRARY_VERSION_MINOR + 48),
-		'.',
-		static_cast<char>(MOCCPP_LIBRARY_VERSION_PATCH + 48),
-		'\0'
-	};
 	return version;
 }
 

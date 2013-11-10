@@ -58,4 +58,4 @@ protected:
     void test_get_library_version_string();
 };
 
-#endif MOCCPP_TESTS_LIB_VERSION_TEST_LIB_VERSION_HPP
+#endif // MOCCPP_TESTS_LIB_VERSION_TEST_LIB_VERSION_HPP

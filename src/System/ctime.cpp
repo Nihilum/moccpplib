@@ -40,7 +40,7 @@ namespace moccpp
 namespace System
 {
 
-inline int32_t gmtime(const time_t* timer, struct tm* result)
+int32_t gmtime(const time_t* timer, struct tm* result)
 {
 #if defined _WIN32 || defined __CYGWIN__
   #ifdef __GNUC__
@@ -70,7 +70,7 @@ inline int32_t gmtime(const time_t* timer, struct tm* result)
     return 0;
 }
 
-inline int32_t asctime(char* buffer, size_t buff_size, const struct tm *_tm)
+int32_t asctime(char* buffer, size_t buff_size, const struct tm *_tm)
 {
     if (buff_size < 26) { // 26: see `man asctime_r`
         return EINVAL;
@@ -104,7 +104,7 @@ inline int32_t asctime(char* buffer, size_t buff_size, const struct tm *_tm)
     return 0;
 }
 
-inline int32_t ctime(char* buffer, size_t buff_size, const time_t* timer)
+int32_t ctime(char* buffer, size_t buff_size, const time_t* timer)
 {
   if (buff_size < 26) { // 26: see `man ctime_r`
     return EINVAL;

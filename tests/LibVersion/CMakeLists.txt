@@ -31,11 +31,40 @@ set(PERF_SRCS
   PerfLibVersion.cpp
   )
 
+if(WIN32)
+  # Disable dll-external warnings for Visual Studio; [/GS-] disable buffer overflow security checks (optimization)
+  set(PROGRAM_COMPILE_FLAGS ${PROGRAM_COMPILE_FLAGS} "/wd4251 /wd4275 /GS-")
+else()
+  # Activate C++11 mode for GNU/GCC; set rpath to $ORIGIN so the shared library can be easily found
+  set(PROGRAM_COMPILE_FLAGS ${PROGRAM_COMPILE_FLAGS} "-std=c++11")
+endif()
+
+SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+SET(CMAKE_INSTALL_RPATH ".")
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--enable-new-dtags")
+
+link_directories(${BOOST_LIBS})
+
 add_executable(${TEST_NAME} ${TEST_SRCS})
 add_executable(${PERF_NAME} ${PERF_SRCS})
 
 target_link_libraries(${TEST_NAME} ${MOCCPP_LIB} ${CPPUNIT_LIB})
-target_link_libraries(${PERF_NAME} ${MOCCPP_LIB})
+
+if(WIN32)
+  target_link_libraries(${PERF_NAME} ${MOCCPP_LIB})
+else()
+  target_link_libraries(${PERF_NAME} ${MOCCPP_LIB} boost_timer boost_system)
+endif()
+
+set_target_properties(${TEST_NAME} PROPERTIES COMPILE_FLAGS
+  "${PROGRAM_COMPILE_FLAGS}"
+)
+
+set_target_properties(${PERF_NAME} PROPERTIES COMPILE_FLAGS
+  "${PROGRAM_COMPILE_FLAGS}"
+)
 
 install(TARGETS ${TEST_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
 install(TARGETS ${PERF_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)

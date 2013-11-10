@@ -37,10 +37,10 @@
 namespace moccpp
 {
 
-MOCCPP_DLL_PUBLIC MOCCPP_CONSTEXPR uint16_t get_library_version_major();
-MOCCPP_DLL_PUBLIC MOCCPP_CONSTEXPR uint16_t get_library_version_minor();
-MOCCPP_DLL_PUBLIC MOCCPP_CONSTEXPR uint16_t get_library_version_patch();
-MOCCPP_DLL_PUBLIC MOCCPP_CONSTEXPR const char* get_library_version_string();
+MOCCPP_DLL_PUBLIC uint16_t get_library_version_major();
+MOCCPP_DLL_PUBLIC uint16_t get_library_version_minor();
+MOCCPP_DLL_PUBLIC uint16_t get_library_version_patch();
+MOCCPP_DLL_PUBLIC const char* get_library_version_string();
 
 }
 

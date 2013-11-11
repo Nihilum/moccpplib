@@ -64,7 +64,7 @@
  */
 
 #ifdef __GNUC__
-#  if __GNUC_PREREQ(4,7)
+#  if __GNUC__ >= 4 && (__GNUC_MINOR__ > 7)
 #    define MOCCPP_CONSTEXPR constexpr
 #  else
 #    define MOCCPP_CONSTEXPR

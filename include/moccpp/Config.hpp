@@ -34,7 +34,7 @@
  * Dynamic-link library Import/Export accross different environments.
  */
 
-#if defined _WIN32 || defined __CYGWIN__
+#if defined _MSC_VER || defined __CYGWIN__
   #ifdef MOCCPP_DLL
     #ifdef __GNUC__
       #define MOCCPP_DLL_PUBLIC __attribute__ ((dllexport))
@@ -60,17 +60,10 @@
 #endif
 
 /**
- * C++11 constexpr keyword support
+ * Macro used to concatenate numbers and strings at compile time
  */
 
-#ifdef __GNUC__
-#  if __GNUC__ >= 4 && (__GNUC_MINOR__ > 7)
-#    define MOCCPP_CONSTEXPR constexpr
-#  else
-#    define MOCCPP_CONSTEXPR
-#  endif
-#else
-#    define MOCCPP_CONSTEXPR
-#endif
+#define MOCCPP_MACRO_NUMBER_TO_STRING_WRAPPED(param) #param
+#define MOCCPP_MACRO_NUMBER_TO_STRING(param) MOCCPP_MACRO_NUMBER_TO_STRING_WRAPPED(param)
 
 #endif // MOCCPP_CONFIG_HPP

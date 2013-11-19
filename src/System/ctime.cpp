@@ -42,7 +42,7 @@ namespace System
 
 int32_t gmtime(const time_t* timer, struct tm* result)
 {
-#if defined _WIN32 || defined __CYGWIN__
+#if defined _MSC_VER || defined __CYGWIN__
   #ifdef __GNUC__
     if (!gmtime_r(timer, result)) {
         return errno;
@@ -76,7 +76,7 @@ int32_t asctime(char* buffer, size_t buff_size, const struct tm *_tm)
         return EINVAL;
     }
 
-#if defined _WIN32 || defined __CYGWIN__
+#if defined _MSC_VER || defined __CYGWIN__
   #ifdef __GNUC__
     if (!asctime_r(_tm, buffer)) {
         return errno;
@@ -110,7 +110,7 @@ int32_t ctime(char* buffer, size_t buff_size, const time_t* timer)
     return EINVAL;
   }
 
-#if defined _WIN32 || defined __CYGWIN__
+#if defined _MSC_VER || defined __CYGWIN__
   #ifdef __GNUC__
     if (!ctime_r(timer, buffer)) {
       return errno;

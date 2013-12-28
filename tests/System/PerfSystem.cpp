@@ -30,11 +30,14 @@
 #include <ctime>
 #include <cmath>
 #include <cstdint>
+#include <cstdarg>
+#include <memory>
 #include <iostream>
 
 #include <boost/timer/timer.hpp>
 
 #include <moccpp/System/ctime.hpp>
+#include <moccpp/System/cstdio.hpp>
 
 using boost::timer::cpu_timer;
 using boost::timer::cpu_times;
@@ -123,9 +126,53 @@ void perf_test_ctime()
     std::cout << "END   perf_test_ctime()\n" << std::endl;
 }
 
+void log_inputter(bool small_buffer, const char* format, va_list args)
+{
+    const uint16_t max_standard_length = 256;
+    char buffer[max_standard_length];
+    char* pBuffer = buffer;
+
+    // try with a small buffer first (which should be very quick)
+    int32_t ret = moccpp::System::vsnprintf(pBuffer, max_standard_length, max_standard_length - 1, format, args);
+
+    if (small_buffer) {
+        return;
+    }
+
+    // small buffer has failed, because the data is too large - alloc a new buffer with suggested size (ret)
+    std::shared_ptr<char> buff_to_write(new char[ret + 1], std::default_delete<char[]>());
+    pBuffer = &(*buff_to_write);
+    pBuffer[ret] = '\0'; // NOTE: this is actually ok, we are not exceeding here, since we've done new char[ret + 1], so we have that 1 extra character
+
+    int32_t final_ret = moccpp::System::vsnprintf(pBuffer, ret + 1, ret, format, args);
+}
+
+void small_logger(bool small_buffer, const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    log_inputter(small_buffer, format, args);
+    va_end(args);
+}
+
+void perf_test_vsnprintf()
+{
+    nanosecond_type const expected_time(1000000); // 1 millisecond
+    std::cout << "START perf_test_vsnprintf()\n";
+
+    cpu_timer timer;
+
+    small_logger(true, "abc %d", 123);
+
+    timer.stop();
+    display_stats(timer, expected_time);
+    std::cout << "END   perf_test_vsnprintf()\n" << std::endl;
+}
+
 int main(int argc, char* argv[])
 {
     perf_test_gmtime();
     perf_test_asctime();
     perf_test_ctime();
+    perf_test_vsnprintf();
 }

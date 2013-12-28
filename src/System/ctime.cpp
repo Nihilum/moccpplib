@@ -25,7 +25,7 @@
  * @file moccpp/System/ctime.cpp
  *
  * @desc Thread-safe gmtime, asctime, ctime C standard library functions compatible
- *  with all operating systems.
+ *  with all supported operating systems.
  */
 
 #include <ctime>

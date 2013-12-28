@@ -22,41 +22,29 @@
  */
 
 /**
- * @file tests/System/TestSystem.hpp
+ * @file moccpp/System/cstdio.hpp
  *
- * @desc Tests checking whether operating system related functions provide proper
- *  results.
+ * @desc vsnprintf C standard library function compatible with all supported operating systems.
  */
 
-#ifndef MOCCPP_TESTS_SYSTEM_TEST_SYSTEM_HPP
-#define MOCCPP_TESTS_SYSTEM_TEST_SYSTEM_HPP
+#ifndef MOCCPP_SYSTEM_CSTDIO_HPP
+#define MOCCPP_SYSTEM_CSTDIO_HPP
 
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/BriefTestProgressListener.h>
+#include <cstdint>
+#include <cstdarg>
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <moccpp/Config.hpp>
 
-class TestSystem : public CPPUNIT_NS::TestCase
+namespace moccpp
 {
-    CPPUNIT_TEST_SUITE(TestSystem);
-    CPPUNIT_TEST(test_gmtime);
-    CPPUNIT_TEST(test_asctime);
-    CPPUNIT_TEST(test_ctime);
-    CPPUNIT_TEST(test_vsnprintf);
-    CPPUNIT_TEST_SUITE_END();
 
-public:
-    void setUp();
-    void tearDown();
+namespace System
+{
 
-protected:
-    void test_gmtime();
-    void test_asctime();
-    void test_ctime();
-    void test_vsnprintf();
-};
+MOCCPP_DLL_PUBLIC int32_t vsnprintf(char * s, size_t size_of_buffer, size_t n, const char * format, va_list arg);
 
-#endif // MOCCPP_TESTS_SYSTEM_TEST_SYSTEM_HPP
+}
+
+}
+
+#endif // MOCCPP_SYSTEM_CSTDIO_HPP

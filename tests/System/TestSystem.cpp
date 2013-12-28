@@ -29,12 +29,17 @@
  */
 
 #include <ctime>
+#include <memory>
+#include <cstdint>
 
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/ui/text/TestRunner.h>
 
+#include <boost/lexical_cast.hpp>
+
 #include <moccpp/Config.hpp>
 #include <moccpp/System/ctime.hpp>
+#include <moccpp/System/cstdio.hpp>
 
 #include "TestSystem.hpp"
 
@@ -155,6 +160,57 @@ void TestSystem::test_ctime()
 #endif
 
     CPPUNIT_ASSERT_EQUAL(std::string(expected_buffer), std::string(buffer));
+}
+
+void log_inputter(bool small_buffer, const char* format, va_list args)
+{
+    const uint16_t max_standard_length = 256;
+    char buffer[max_standard_length];
+    char* pBuffer = buffer;
+
+    // try with a small buffer first (which should be very quick)
+    int32_t ret = moccpp::System::vsnprintf(pBuffer, max_standard_length, max_standard_length - 1, format, args);
+
+    CPPUNIT_ASSERT(ret >= 0);
+
+    if (small_buffer) {
+        CPPUNIT_ASSERT(ret < max_standard_length);
+        return;
+    }
+
+    CPPUNIT_ASSERT(ret >= max_standard_length);
+
+    // small buffer has failed, because the data is too large - alloc a new buffer with suggested size (ret)
+    std::shared_ptr<char> buff_to_write(new char[ret + 1], std::default_delete<char[]>());
+    pBuffer = &(*buff_to_write);
+    pBuffer[ret] = '\0'; // NOTE: this is actually ok, we are not exceeding here, since we've done new char[ret + 1], so we have that 1 extra character
+
+    int32_t final_ret = moccpp::System::vsnprintf(pBuffer, ret + 1, ret, format, args);
+
+    CPPUNIT_ASSERT(final_ret >= 0);
+    CPPUNIT_ASSERT(final_ret < (ret + 1));
+}
+
+void small_logger(bool small_buffer, const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    log_inputter(small_buffer, format, args);
+    va_end(args);
+}
+
+void TestSystem::test_vsnprintf()
+{
+    small_logger(true, "abc %d", 12);
+    small_logger(true, "def %d", 24);
+
+    std::string large_buffer;
+
+    for (uint16_t i = 0; i < 256; ++i) {
+        large_buffer += boost::lexical_cast<std::string>(i);
+    }
+
+    small_logger(false, "%s", large_buffer.c_str());
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestSystem);

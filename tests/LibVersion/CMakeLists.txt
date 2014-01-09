@@ -20,16 +20,11 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 set(TEST_NAME moccpp_test_lib_version)
-set(PERF_NAME moccpp_perf_lib_version)
 
 set(TEST_SRCS
   TestLibVersion.hpp
   TestLibVersion.cpp
-  )
-
-set(PERF_SRCS
-  PerfLibVersion.cpp
-  )
+)
 
 if(WIN32)
   # Disable dll-external warnings for Visual Studio; [/GS-] disable buffer overflow security checks (optimization)
@@ -51,23 +46,11 @@ endif()
 link_directories(${BOOST_LIBS})
 
 add_executable(${TEST_NAME} ${TEST_SRCS})
-add_executable(${PERF_NAME} ${PERF_SRCS})
 
 target_link_libraries(${TEST_NAME} ${MOCCPP_LIB} ${CPPUNIT_LIB})
-
-if(WIN32)
-  target_link_libraries(${PERF_NAME} ${MOCCPP_LIB})
-else()
-  target_link_libraries(${PERF_NAME} ${MOCCPP_LIB} boost_timer boost_system)
-endif()
 
 set_target_properties(${TEST_NAME} PROPERTIES COMPILE_FLAGS
   "${PROGRAM_COMPILE_FLAGS}"
 )
 
-set_target_properties(${PERF_NAME} PROPERTIES COMPILE_FLAGS
-  "${PROGRAM_COMPILE_FLAGS}"
-)
-
 install(TARGETS ${TEST_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
-install(TARGETS ${PERF_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)

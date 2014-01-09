@@ -39,26 +39,26 @@ namespace moccpp
 
 constexpr uint16_t get_library_version_major()
 {
-	return MOCCPP_LIBRARY_VERSION_MAJOR;
+	return 0;
 }
 
 constexpr uint16_t get_library_version_minor()
 {
-	return MOCCPP_LIBRARY_VERSION_MINOR;
+	return 2;
 }
 
 constexpr uint16_t get_library_version_patch()
 {
-	return MOCCPP_LIBRARY_VERSION_PATCH;
+	return 0;
 }
 
 constexpr const char* get_library_version_string()
 {
-	return MOCCPP_MACRO_NUMBER_TO_STRING(MOCCPP_LIBRARY_VERSION_MAJOR)
+	return MOCCPP_MACRO_NUMBER_TO_STRING(0)
 			"."
-			MOCCPP_MACRO_NUMBER_TO_STRING(MOCCPP_LIBRARY_VERSION_MINOR)
+			MOCCPP_MACRO_NUMBER_TO_STRING(2)
 			"."
-			MOCCPP_MACRO_NUMBER_TO_STRING(MOCCPP_LIBRARY_VERSION_PATCH);
+			MOCCPP_MACRO_NUMBER_TO_STRING(0);
 }
 
 }

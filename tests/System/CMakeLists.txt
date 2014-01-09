@@ -43,7 +43,7 @@ if(NOT DEFINED WIN32)
   SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--enable-new-dtags")
 endif()
 
-link_directories(${BOOST_LIBS})
+link_directories(${Boost_LIBRARY_DIRS})
 
 add_executable(${TEST_NAME} ${TEST_SRCS})
 

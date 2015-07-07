@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2013 Mateusz Kolodziejski
+ * Copyright (c) 2013-2015 Mateusz Kolodziejski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -31,9 +31,6 @@
 #include <ctime>
 #include <memory>
 #include <cstdint>
-
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/ui/text/TestRunner.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -211,26 +208,4 @@ void TestSystem::test_vsnprintf()
     }
 
     small_logger(false, "%s", large_buffer.c_str());
-}
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestSystem);
-
-int main(int argc, char* argv[])
-{
-    CPPUNIT_NS::TestResult controller;
-
-    CPPUNIT_NS::TestResultCollector result;
-    controller.addListener(&result);
-
-    CPPUNIT_NS::BriefTestProgressListener progress;
-    controller.addListener(&progress);
-
-    CPPUNIT_NS::TextUi::TestRunner runner;
-    runner.addTest(CPPUNIT_NS::TestFactoryRegistry::getRegistry().makeTest());
-    runner.run(controller);
-
-    CPPUNIT_NS::CompilerOutputter outputter(&result, std::cerr);
-    outputter.write();
-
-    return result.wasSuccessful() ? 0 : 1;
 }

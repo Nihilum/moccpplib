@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2013-2015 Mateusz Kolodziejski
+ * Copyright (c) 2014-2015 Mateusz Kolodziejski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -22,35 +22,20 @@
  */
 
 /**
- * @file tests/System/TestSystem.hpp
+ * @file tests/Tests.cpp
  *
- * @desc Tests checking whether operating system related functions provide proper
- *  results.
+ * @desc Entry point for all moccpplib tests.
  */
-
-#ifndef MOCCPP_TESTS_SYSTEM_TEST_SYSTEM_HPP
-#define MOCCPP_TESTS_SYSTEM_TEST_SYSTEM_HPP
 
 #include <moctest/moctest.hpp>
 
-class TestSystem : public CPPUNIT_NS::TestCase
+#include "LibVersion/TestLibVersion.hpp"
+#include "System/TestSystem.hpp"
+
+int main(int argc, char* argv[])
 {
-    CPPUNIT_TEST_SUITE(TestSystem);
-    CPPUNIT_TEST(test_gmtime);
-    CPPUNIT_TEST(test_asctime);
-    CPPUNIT_TEST(test_ctime);
-    CPPUNIT_TEST(test_vsnprintf);
-    CPPUNIT_TEST_SUITE_END();
-
-public:
-    void setUp();
-    void tearDown();
-
-protected:
-    void test_gmtime();
-    void test_asctime();
-    void test_ctime();
-    void test_vsnprintf();
-};
-
-#endif // MOCCPP_TESTS_SYSTEM_TEST_SYSTEM_HPP
+    moctest::Framework tests(argc, argv);
+    tests.register_suite<TestLibVersion>();
+    tests.register_suite<TestSystem>();
+    return tests.run();
+}

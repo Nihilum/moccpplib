@@ -58,13 +58,14 @@ if (USE_DEPS)
   file(GLOB DEPS_DIR ${CMAKE_SOURCE_DIR}/deps/*)
   set(BOOST_ROOT ${DEPS_DIR})
   set(CPPUNIT_ROOT ${DEPS_DIR})
+  set(MOCTEST_ROOT ${DEPS_DIR})
 endif()
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
-find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(cppunit REQUIRED)
 
 # Prepare project
@@ -126,7 +127,7 @@ target_link_libraries(${LIBRARY_NAME}
 set(MOCCPP_LIB ${LIBRARY_NAME})
 
 # Build all tests
-#add_subdirectory(tests)
+add_subdirectory(tests)
 
 # Install RTM
 install(TARGETS ${LIBRARY_NAME}
@@ -145,6 +146,8 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/include
 if (WIN32)
   install(FILES "${Boost_SYSTEM_LIBRARY_RELEASE}" DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
   install(FILES "${Boost_SYSTEM_LIBRARY_DEBUG}" DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
+  install(FILES "${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE}" DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
+  install(FILES "${Boost_PROGRAM_OPTIONS_LIBRARY_DEBUG}" DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
   install(FILES "${CPPUNIT_LIBRARY_INSTALL}" DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
   if(CMAKE_BUILD_TYPE MATCHES "Debug")
     install(FILES "${CPPUNIT_DEBUG_LIBRARY_INSTALL}" DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)

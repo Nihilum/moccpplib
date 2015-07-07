@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2013 Mateusz Kolodziejski
+ * Copyright (c) 2013-2015 Mateusz Kolodziejski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -44,7 +44,7 @@ constexpr uint16_t get_library_version_major()
 
 constexpr uint16_t get_library_version_minor()
 {
-	return 2;
+	return 3;
 }
 
 constexpr uint16_t get_library_version_patch()
@@ -56,7 +56,7 @@ constexpr const char* get_library_version_string()
 {
 	return MOCCPP_MACRO_NUMBER_TO_STRING(0)
 			"."
-			MOCCPP_MACRO_NUMBER_TO_STRING(2)
+			MOCCPP_MACRO_NUMBER_TO_STRING(3)
 			"."
 			MOCCPP_MACRO_NUMBER_TO_STRING(0);
 }

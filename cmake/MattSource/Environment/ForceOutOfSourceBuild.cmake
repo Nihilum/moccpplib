@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 #
-# Copyright (c) 2013 Mateusz Kolodziejski
+# Copyright (c) 2014-2015 Mateusz Kolodziejski
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
 # this software and associated documentation files (the "Software"), to deal in
@@ -19,38 +19,22 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-set(TEST_NAME moccpp_test_lib_version)
+function(MSource_ForceOutOfSourceBuild)
+  string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}" BUILDING_IN_SOURCE)
 
-set(TEST_SRCS
-  TestLibVersion.hpp
-  TestLibVersion.cpp
-)
+  if (EXISTS ${CMAKE_SOURCE_DIR}/CMakeCache.txt)
+    set (BUILDING_IN_SOURCE 1)
+  endif()
 
-if(WIN32)
-  # Disable dll-external warnings for Visual Studio; [/GS-] disable buffer overflow security checks (optimization)
-  set(PROGRAM_COMPILE_FLAGS ${PROGRAM_COMPILE_FLAGS} "/wd4251 /wd4275 /GS-")
-else()
-  # Activate C++11 mode for GNU/GCC; set rpath to $ORIGIN so the shared library can be easily found
-  set(PROGRAM_COMPILE_FLAGS ${PROGRAM_COMPILE_FLAGS} "-std=c++11")
-endif()
+  if (EXISTS ${CMAKE_SOURCE_DIR}/CMakeFiles)
+    set (BUILDING_IN_SOURCE 1)
+  endif()
 
-SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
-SET(CMAKE_INSTALL_RPATH "\$ORIGIN")
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-if(NOT DEFINED WIN32)
-  SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--enable-new-dtags")
-endif()
-
-link_directories(${BOOST_LIBS})
-
-add_executable(${TEST_NAME} ${TEST_SRCS})
-
-target_link_libraries(${TEST_NAME} ${MOCCPP_LIB} ${CPPUNIT_LIB})
-
-set_target_properties(${TEST_NAME} PROPERTIES COMPILE_FLAGS
-  "${PROGRAM_COMPILE_FLAGS}"
-)
-
-install(TARGETS ${TEST_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
+  if (BUILDING_IN_SOURCE)
+    message(FATAL_ERROR
+      "\nThis project requires an out of source build. Remove the file 'CMakeCache.txt' and the folder 'CMakeFiles' "
+      "found in this directory before continuing, create a separate build directory and "
+      "run 'cmake <srcs> [options]' from there (e.g. 'cmake ..').\n"
+    )
+  endif()
+endfunction()

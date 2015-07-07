@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2013 Mateusz Kolodziejski
+ * Copyright (c) 2013-2015 Mateusz Kolodziejski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -26,9 +26,6 @@
  *
  * @desc Three tests which compare LibVersion functions results with the library version macros.
  */
-
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/ui/text/TestRunner.h>
 
 #include <moccpp/LibVersion.hpp>
 
@@ -73,26 +70,4 @@ void TestLibVersion::test_get_library_version_string()
 
     const char* expected_version = version;
     CPPUNIT_ASSERT_EQUAL(std::string(expected_version), std::string(moccpp::get_library_version_string()));
-}
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestLibVersion);
-
-int main(int argc, char* argv[])
-{
-    CPPUNIT_NS::TestResult controller;
-
-    CPPUNIT_NS::TestResultCollector result;
-    controller.addListener(&result);
-
-    CPPUNIT_NS::BriefTestProgressListener progress;
-    controller.addListener(&progress);
-
-    CPPUNIT_NS::TextUi::TestRunner runner;
-    runner.addTest(CPPUNIT_NS::TestFactoryRegistry::getRegistry().makeTest());
-    runner.run(controller);
-
-    CPPUNIT_NS::CompilerOutputter outputter(&result, std::cerr);
-    outputter.write();
-
-    return result.wasSuccessful() ? 0 : 1;
 }

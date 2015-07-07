@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2013 Mateusz Kolodziejski
+ * Copyright (c) 2013-2015 Mateusz Kolodziejski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -33,6 +33,7 @@
 #include <cstring>
 
 #include <moccpp/System/ctime.hpp>
+#include <time.h>
 
 namespace moccpp
 {
@@ -42,8 +43,8 @@ namespace System
 
 int32_t gmtime(const time_t* timer, struct tm* result)
 {
-#if defined _MSC_VER || defined __CYGWIN__
-  #ifdef __GNUC__
+#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
+  #if defined __GNUC__ && !defined __MINGW32__
     if (!gmtime_r(timer, result)) {
         return errno;
     }
@@ -54,7 +55,7 @@ int32_t gmtime(const time_t* timer, struct tm* result)
     }
   #endif
 #else
-  #ifdef __GNUC__
+  #if defined __GNUC__
     if (!gmtime_r(timer, result)) {
         return errno;
     }
@@ -76,8 +77,8 @@ int32_t asctime(char* buffer, size_t buff_size, const struct tm *_tm)
         return EINVAL;
     }
 
-#if defined _MSC_VER || defined __CYGWIN__
-  #ifdef __GNUC__
+#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
+  #if defined __GNUC__ && !defined __MINGW32__
     if (!asctime_r(_tm, buffer)) {
         return errno;
     }
@@ -110,8 +111,8 @@ int32_t ctime(char* buffer, size_t buff_size, const time_t* timer)
     return EINVAL;
   }
 
-#if defined _MSC_VER || defined __CYGWIN__
-  #ifdef __GNUC__
+#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
+  #if defined __GNUC__ && !defined __MINGW32__
     if (!ctime_r(timer, buffer)) {
       return errno;
     }

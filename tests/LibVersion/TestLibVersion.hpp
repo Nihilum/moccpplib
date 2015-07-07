@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2013 Mateusz Kolodziejski
+ * Copyright (c) 2013-2015 Mateusz Kolodziejski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -30,13 +30,7 @@
 #ifndef MOCCPP_TESTS_LIB_VERSION_TEST_LIB_VERSION_HPP
 #define MOCCPP_TESTS_LIB_VERSION_TEST_LIB_VERSION_HPP
 
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/BriefTestProgressListener.h>
-
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <moctest/moctest.hpp>
 
 class TestLibVersion : public CPPUNIT_NS::TestCase
 {

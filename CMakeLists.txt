@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 #
-# Copyright (c) 2013 Mateusz Kolodziejski
+# Copyright (c) 2014-2015 Mateusz Kolodziejski
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
 # this software and associated documentation files (the "Software"), to deal in
@@ -19,46 +19,117 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-cmake_minimum_required(VERSION 2.8)
-project(moccpplib)
+cmake_minimum_required(VERSION 3.2.2)
+project(moccpplib CXX)
+
+set(MOCCPP_VERSION 0.3.0)
+set(MOCCPP_TAG dev)
+set(MOCCPP_EMAIL matt@mattsource.com)
 set(LIBRARY_NAME moccpp)
 
 add_definitions(
   -DMOCCPP_LIBRARY_VERSION_MAJOR=0
-  -DMOCCPP_LIBRARY_VERSION_MINOR=2
+  -DMOCCPP_LIBRARY_VERSION_MINOR=3
   -DMOCCPP_LIBRARY_VERSION_PATCH=0
 )
 
-if(WIN32)
+# Make sure that we can find all CMake includes
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_SOURCE_DIR}/cmake/MattSource/Libraries)
+
+include(MattSource/MattSource)
+
+MSource_ForceOutOfSourceBuild()
+MSource_DetermineAddressModel(MSOURCE_ADDRESS_MODEL)
+message(STATUS "Detected ${MSOURCE_ADDRESS_MODEL}-bit address model.")
+
+set(USE_DEPS "TRUE" CACHE BOOL "Use deps.txt file and artifactory")
+set(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT "TRUE" CACHE BOOL "Use default cmake install prefix.")
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/rtm" CACHE STRING "Place where rtm files will be saved." FORCE)
+endif()
+
+# Prepare 3rd party libraries
+
+if (USE_DEPS)
+  MSource_GetDependencies()
+  MSource_AdjustBoost()
+
+  file(GLOB DEPS_DIR ${CMAKE_SOURCE_DIR}/deps/*)
+  set(BOOST_ROOT ${DEPS_DIR})
+  set(CPPUNIT_ROOT ${DEPS_DIR})
+  set(MOCTEST_ROOT ${DEPS_DIR})
+endif()
+
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+
+find_package(Boost REQUIRED COMPONENTS system program_options)
+find_package(cppunit REQUIRED)
+
+# Prepare project
+
+# Compile flags
+if(WIN32 AND NOT MINGW)
   # Disable dll-external warnings for Visual Studio; [/GS-] disable buffer overflow security checks (optimization)
-  set(LIBRARY_COMPILE_FLAGS ${LIBRARY_COMPILE_FLAGS} "-DMOCCPP_DLL=1 /wd4251 /wd4275 /GS-")
+  set(LIBRARY_COMPILE_FLAGS ${LIBRARY_COMPILE_FLAGS} "-DMOCCPP_DLL=1 /wd4251 /wd4275 /wd4351 /GS-")
 else()
   # Activate C++11 mode for GNU/GCC
   set(LIBRARY_COMPILE_FLAGS ${LIBRARY_COMPILE_FLAGS} "-std=c++11 -DMOCCPP_DLL=1")
 endif()
 
+# Source files and includes
 file(GLOB_RECURSE LIBRARY_SRCS ${CMAKE_SOURCE_DIR}/src/ ${CMAKE_SOURCE_DIR}/src/*.cpp ${CMAKE_SOURCE_DIR}/include/*.hpp)
 
-link_directories(${BOOST_LIBS})
+# Link directories
+link_directories(${Boost_LIBRARY_DIR})
 
+# Include dirs
 include_directories(
   ${CMAKE_SOURCE_DIR}/include/
-  ${CPPUNIT_INCLUDES}
-  ${BOOST_INCLUDES}
+  ${CPPUNIT_INCLUDE_DIR}/
+  ${Boost_INCLUDE_DIR}
 )
 
-add_definitions( ${Boost_LIB_DIAGNOSTIC_DEFINITIONS} )
-add_definitions( -DBOOST_ALL_DYN_LINK )
-add_definitions( -DBOOST_FILESYSTEM_NO_DEPRECATED )
+# Compilation definitions
+add_definitions( ${Boost_LIB_DIAGNOSTIC_DEFINITIONS} ) # http://www.cmake.org/cmake/help/v3.2/module/FindBoost.html
+add_definitions( -DBOOST_ALL_DYN_LINK ) # use boost dlls
 
+if (MINGW)
+  add_definitions(-std=c++11)
+endif()
+
+# Properly setup RPATH (Linux)
+SET(CMAKE_SKIP_BUILD_RPATH FALSE)
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+SET(CMAKE_INSTALL_RPATH "\$ORIGIN:\$ORIGIN/../lib")
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+# Specify that this project will build a library
 add_library(${LIBRARY_NAME} SHARED
   ${LIBRARY_SRCS}
 )
 
+set_target_properties(${LIBRARY_NAME} PROPERTIES COMPILE_FLAGS
+  "${LIBRARY_COMPILE_FLAGS}"
+)
+
+# Link libraries
+target_link_libraries(${LIBRARY_NAME}
+  debug ${CPPUNIT_DEBUG_LIBRARY}
+  optimized ${CPPUNIT_LIBRARY}
+  debug ${Boost_SYSTEM_LIBRARY_DEBUG}
+  optimized ${Boost_SYSTEM_LIBRARY_RELEASE}
+)
+
+# Use helper variable for linking in tests
 set(MOCCPP_LIB ${LIBRARY_NAME})
 
+# Build all tests
 add_subdirectory(tests)
 
+# Install RTM
 install(TARGETS ${LIBRARY_NAME}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
 )
@@ -71,35 +142,14 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/include
     DESTINATION ${CMAKE_INSTALL_PREFIX}
 )
 
-# Install Boost libraries and moccpp library if on Windows
-if (DEFINED WIN32)
-  add_definitions( -D_WIN32_WINNT=0x0501 )
-
-  set(MOCCPP_BOOST_LIBS_INUSE ${MOCCPP_BOOST_LIBS_INUSE} "boost_chrono-.*")
-  set(MOCCPP_BOOST_LIBS_INUSE ${MOCCPP_BOOST_LIBS_INUSE} "boost_date_time-.*")
-  set(MOCCPP_BOOST_LIBS_INUSE ${MOCCPP_BOOST_LIBS_INUSE} "boost_filesystem-.*")
-  set(MOCCPP_BOOST_LIBS_INUSE ${MOCCPP_BOOST_LIBS_INUSE} "boost_log_setup-.*")
-  set(MOCCPP_BOOST_LIBS_INUSE ${MOCCPP_BOOST_LIBS_INUSE} "boost_log-.*")
-  set(MOCCPP_BOOST_LIBS_INUSE ${MOCCPP_BOOST_LIBS_INUSE} "boost_program_options-.*")
-  set(MOCCPP_BOOST_LIBS_INUSE ${MOCCPP_BOOST_LIBS_INUSE} "boost_regex-.*")
-  set(MOCCPP_BOOST_LIBS_INUSE ${MOCCPP_BOOST_LIBS_INUSE} "boost_system-.*")
-  set(MOCCPP_BOOST_LIBS_INUSE ${MOCCPP_BOOST_LIBS_INUSE} "boost_thread-.*")
-  set(MOCCPP_BOOST_LIBS_INUSE ${MOCCPP_BOOST_LIBS_INUSE} "boost_timer-.*")
-
-
-  file(TO_CMAKE_PATH ${BOOST_LIBS} MOCCPP_BOOST_LIBS)
-  file(GLOB_RECURSE MOCCPP_BOOST_LIBS_INSTALL ${MOCCPP_BOOST_LIBS}/ ${MOCCPP_BOOST_LIBS}/*.dll)
-
-  foreach(fName ${MOCCPP_BOOST_LIBS_INSTALL})
-    foreach(libName ${MOCCPP_BOOST_LIBS_INUSE})
-      if(${fName} MATCHES ${libName})
-        install(FILES "${fName}" DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
-      endif()
-    endforeach()
-  endforeach()
+# Install Boost libraries and cppunit library.
+if (WIN32)
+  install(FILES "${Boost_SYSTEM_LIBRARY_RELEASE}" DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
+  install(FILES "${Boost_SYSTEM_LIBRARY_DEBUG}" DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
+  install(FILES "${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE}" DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
+  install(FILES "${Boost_PROGRAM_OPTIONS_LIBRARY_DEBUG}" DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
+  install(FILES "${CPPUNIT_LIBRARY_INSTALL}" DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
+  if(CMAKE_BUILD_TYPE MATCHES "Debug")
+    install(FILES "${CPPUNIT_DEBUG_LIBRARY_INSTALL}" DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
+  endif()
 endif()
-
-
-set_target_properties(${LIBRARY_NAME} PROPERTIES COMPILE_FLAGS
-  "${LIBRARY_COMPILE_FLAGS}"
-)

@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 Mateusz Kolodziejski
+ * Copyright (c) 2013-2015 Mateusz Kolodziejski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -22,22 +22,54 @@
  */
 
 /**
- * @file tests/Tests.cpp
+ * @file moccpp/Multithreading/synchronized.hpp
  *
- * @desc Entry point for all moccpplib tests.
+ * @desc template class which allows to synchronize multithreaded access to the underlying data.
  */
 
-#include <moctest/moctest.hpp>
+#ifndef MOCCPP_MULTITHREADING_SYNCHRONIZED_HPP
+#define MOCCPP_MULTITHREADING_SYNCHRONIZED_HPP
 
-#include "LibVersion/TestLibVersion.hpp"
-#include "System/TestSystem.hpp"
-#include "Multithreading/TestMultithreading.hpp"
+#include <moccpp/Config.hpp>
 
-int main(int argc, char* argv[])
+namespace moccpp
 {
-    moctest::Framework tests(argc, argv);
-    tests.register_suite<TestLibVersion>();
-    tests.register_suite<TestSystem>();
-    tests.register_suite<TestMultithreading>();
-    return tests.run();
+
+namespace Multithreading
+{
+
+template<typename T, class M, typename G>
+class synchronized final
+{
+public:
+    synchronized() : m_data{} {}
+    synchronized(const T& data) : m_data(data) {}
+    ~synchronized() {}
+
+    synchronized(const synchronized&) = delete;
+    synchronized(synchronized&&) = delete;
+
+    synchronized& operator=(const synchronized&) = delete;
+
+    synchronized& operator=(const T& rhs)
+    {
+        G lock(const_cast<M&>(m_mutex));
+        m_data = rhs;
+    }
+
+    operator T() const
+    {
+        G lock(const_cast<M&>(m_mutex));
+        return m_data;
+    }
+
+private:
+    M m_mutex;
+    T m_data;
+};
+
 }
+
+}
+
+#endif // MOCCPP_MULTITHREADING_SYNCHRONIZED_HPP

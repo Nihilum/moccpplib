@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 Mateusz Kolodziejski
+ * Copyright (c) 2013-2015 Mateusz Kolodziejski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -22,22 +22,30 @@
  */
 
 /**
- * @file tests/Tests.cpp
+ * @file tests/Multithreading/TestMultithreading.hpp
  *
- * @desc Entry point for all moccpplib tests.
+ * @desc Tests for all multithreading related classes and functions.
  */
+
+#ifndef MOCCPP_TESTS_MULTITHREADING_TEST_MULTITHREADING_HPP
+#define MOCCPP_TESTS_MULTITHREADING_TEST_MULTITHREADING_HPP
 
 #include <moctest/moctest.hpp>
 
-#include "LibVersion/TestLibVersion.hpp"
-#include "System/TestSystem.hpp"
-#include "Multithreading/TestMultithreading.hpp"
-
-int main(int argc, char* argv[])
+class TestMultithreading : public CPPUNIT_NS::TestCase
 {
-    moctest::Framework tests(argc, argv);
-    tests.register_suite<TestLibVersion>();
-    tests.register_suite<TestSystem>();
-    tests.register_suite<TestMultithreading>();
-    return tests.run();
-}
+    CPPUNIT_TEST_SUITE(TestMultithreading);
+    CPPUNIT_TEST(test_synchronized);
+    CPPUNIT_TEST(test_synchronized_multithreading);
+    CPPUNIT_TEST_SUITE_END();
+
+public:
+    void setUp();
+    void tearDown();
+
+protected:
+    void test_synchronized();
+    void test_synchronized_multithreading();
+};
+
+#endif // MOCCPP_TESTS_MULTITHREADING_TEST_MULTITHREADING_HPP

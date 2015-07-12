@@ -27,6 +27,7 @@
  * @desc Tests for all multithreading related classes and functions.
  */
 
+#include <chrono>
 #include <mutex>
 #include <thread>
 #include <cstdint>
@@ -46,6 +47,7 @@ void TestMultithreading::tearDown()
 struct TestStruct
 {
     moccpp::Multithreading::synchronized<uint32_t, std::mutex, std::lock_guard<std::mutex>> number;
+    moccpp::Multithreading::synchronized<bool, std::mutex, std::lock_guard<std::mutex>> run;
 
     uint32_t get_number()
     {
@@ -55,6 +57,16 @@ struct TestStruct
     void set_number(uint32_t num)
     {
         number = num;
+    }
+
+    bool isRunning()
+    {
+        return run;
+    }
+
+    void set_running(bool running)
+    {
+        run = running;
     }
 };
 
@@ -68,39 +80,27 @@ void TestMultithreading::test_synchronized()
     CPPUNIT_ASSERT_EQUAL(expected, actual);
 }
 
-uint32_t global_counter = 0;
-
-void increment(TestStruct& testStruct)
+void run_thread(TestStruct& testStruct, uint32_t& count)
 {
-    uint32_t number = testStruct.number;
-    ++number;
-    ++global_counter;
-    testStruct.number = number;
-
-    CPPUNIT_ASSERT_EQUAL(global_counter, number);
+    while (testStruct.isRunning())
+    {
+        ++count;
+    }
 }
 
 void TestMultithreading::test_synchronized_multithreading()
 {
-    const uint32_t expected = 6;
-
     TestStruct testStruct{};
-    testStruct.set_number(0);
+    testStruct.set_running(true);
 
-    std::thread t1(increment, std::ref(testStruct));
-    std::thread t2(increment, std::ref(testStruct));
-    std::thread t3(increment, std::ref(testStruct));
-    std::thread t4(increment, std::ref(testStruct));
-    std::thread t5(increment, std::ref(testStruct));
-    std::thread t6(increment, std::ref(testStruct));
+    uint32_t count = 0;
+
+    std::thread t1(run_thread, std::ref(testStruct), std::ref(count));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    testStruct.set_running(false);
 
     t1.join();
-    t2.join();
-    t3.join();
-    t4.join();
-    t5.join();
-    t6.join();
 
-    uint32_t actual = testStruct.get_number();
-    CPPUNIT_ASSERT_EQUAL(expected, actual);
+    CPPUNIT_ASSERT(count > 0);
 }

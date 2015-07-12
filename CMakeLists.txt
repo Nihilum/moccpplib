@@ -22,7 +22,7 @@
 cmake_minimum_required(VERSION 3.2.2)
 project(moccpplib CXX)
 
-set(MOCCPP_VERSION 0.3.0)
+set(MOCCPP_VERSION 0.3.1)
 set(MOCCPP_TAG dev)
 set(MOCCPP_EMAIL matt@mattsource.com)
 set(LIBRARY_NAME moccpp)
@@ -30,7 +30,7 @@ set(LIBRARY_NAME moccpp)
 add_definitions(
   -DMOCCPP_LIBRARY_VERSION_MAJOR=0
   -DMOCCPP_LIBRARY_VERSION_MINOR=3
-  -DMOCCPP_LIBRARY_VERSION_PATCH=0
+  -DMOCCPP_LIBRARY_VERSION_PATCH=1
 )
 
 # Make sure that we can find all CMake includes
